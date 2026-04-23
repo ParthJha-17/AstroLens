@@ -11,7 +11,7 @@
 | PM | DONE | 2026-04-23 |
 | Senior SDE | DONE → devs | 2026-04-23 |
 | Backend Dev | BE-01–08 ✅ ALL COMPLETE | 2026-04-23 |
-| Frontend Dev | DONE (M3) — FE-01–12 complete, live at https://frontend-rose-six-21.vercel.app | 2026-04-23 |
+| Frontend Dev | DONE (M3/M4/M5) — all FE tasks complete, live at https://frontend-rose-six-21.vercel.app | 2026-04-23 |
 
 ---
 

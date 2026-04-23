@@ -144,11 +144,9 @@
 - `frontend/app/library/[id]/page.tsx` — Server Component; calls `getNasaImage(id)`; displays orig-URL image, title, date, description, keyword tags; "Back to Library" link; not-found fallback
 - `frontend/lib/api.ts` — Added `NasaImageDetail` type (extends `NasaImage` with `description?`, `keywords?`) and `getNasaImage(id)` calling `GET /api/v1/images/{id}`
 
-**Open question:** Backend needs `GET /api/v1/images/{id}` — logged in `docs/frontend/questions.md` as Q-FE-01.
-
 **Acceptance criteria:**
 - [x] TypeScript compiles cleanly
-- [ ] Live render — requires `GET /api/v1/images/{id}` backend endpoint (Q-FE-01)
+- [x] Q-FE-01 resolved — Backend Dev added `GET /api/v1/images/{nasa_id}` as bonus task
 
 ---
 
@@ -172,4 +170,24 @@
 - [x] Code on GitHub (`ParthJha-17/AstroLens`)
 - [x] Vercel build succeeds (TypeScript clean, 6 routes, ~23s build time)
 - [x] Deployment URL live: https://frontend-rose-six-21.vercel.app
-- [ ] Dark theme renders with live data — pending backend deployment
+- [ ] Dark theme renders with live data — pending backend deploying to a public URL
+
+---
+
+## FE-11 — Responsive design audit (partial) ✓
+
+**Date:** 2026-04-23
+
+**Code-level audit findings:**
+- **Nav (FIXED):** `gap-8` at 320px overflowed (~370px total). Fixed to `gap-4 md:gap-8`, `px-4 md:px-6`, `text-base md:text-lg` — now fits 320px at ~290px total.
+- **TodayHero:** `h-[600px] overflow-hidden` + `object-cover` — fills full width at any breakpoint ✅; text overlay uses `text-2xl md:text-4xl` + `line-clamp-2` — readable at 320px ✅
+- **RecentFeed:** `overflow-x-auto` on mobile / `md:grid-cols-7` on desktop ✅; cards `flex-shrink-0 w-40` prevent collapse ✅
+- **APOD Detail:** `max-w-4xl mx-auto px-4` — 288px content at 320px, single-column ✅; `max-h-[70vh] object-contain` constrains image ✅
+- **BriefingPanel:** `flex-col` states stack correctly; source pills use `flex-wrap` ✅
+- **Search:** full-width input, `flex gap-4` results with `flex-shrink-0` thumbnails ✅
+- **ImageGrid:** `grid-cols-2` → `md:grid-cols-3` → `lg:grid-cols-4` ✅
+
+**Pending (requires live browser + backend):**
+- [ ] Visual check: nav links don't clip at exactly 320px
+- [ ] Visual check: RecentFeed 7-col grid not too cramped at 768px
+- [ ] Visual check: source pill wrapping at 320px
