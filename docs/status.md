@@ -35,13 +35,19 @@
 - **FE-12 (partial):** Code pushed to GitHub at `https://github.com/ParthJha-17/AstroLens`; Vercel deploy blocked on browser OAuth — see Q-FE-02 in `docs/frontend/questions.md` for manual steps (vercel.com/new or add Vercel token to secrets.md)
 - **FE-12:** Vercel deploy complete ✅ — https://frontend-rose-six-21.vercel.app — build: 23s, TypeScript clean, 6 routes; `NEXT_PUBLIC_API_URL` set (placeholder — update to real backend URL when BE deploys)
 
-## Backend Dev | 2026-04-23 | BE-01/02/03 ✅ live and verified
+## Backend Dev | 2026-04-23 | BE-01–08 ✅ ALL COMPLETE
 
-- **BE-01:** Scaffold complete, all packages installed (Python 3.13), DB schema applied (apod_cache, briefings, nasa_images), server starts and pool connects
-- **BE-02:** `GET /api/v1/apod/today` — NASA cache-miss → NASA API → Neon insert; cache-hit returns instantly ✅
-- **BE-03:** `GET /api/v1/apod/feed` — 7-day call returns 7 items; second call from DB cache; 113-day range returns 400 ✅
-- Fixes: asyncpg DATE binding (`datetime.date` not str), NASA timeout bumped 10s→30s, `limiter.py` extracted
-- **Next: BE-04** (`GET /apod/search`)
+- **BE-01:** Scaffold + DB schema, all packages installed (Python 3.13)
+- **BE-02:** `GET /apod/today` — cache-miss→NASA→Neon, cache-hit instant ✅
+- **BE-03:** `GET /apod/feed` — 7-day range, 30-day guard (400), partial cache fill ✅
+- **BE-04:** `GET /apod/search` — full-text ranked results, empty-q → 422 ✅
+- **BE-05:** `GET /images/search` — NASA Image Library, 20 results ✅
+- **BE-06:** GPT-4o agent — two-pass tool calling, DuckDuckGo web_search (`ddgs==9.14.1`), graceful tool failure ✅
+- **BE-07:** `POST /briefings/generate` — agent+cache, 5 sources, 5 facts ✅
+- **BE-08:** `GET /briefings/{date}` — 200 or 404 ✅
+- **Bonus:** `GET /images/{nasa_id}` — added to unblock Q-FE-01 (Frontend library detail page) ✅
+- Key fixes this session: asyncpg DATE binding, NASA timeout 10s→30s, JSONB `_j()` parser, `ddgs` upgrade, `parallel_tool_calls` removed (openai 1.30 unsupported)
+- **Remaining:** BE-09 (APScheduler daily job, P2) and BE-10 (rate limiting inline — mostly done via slowapi)
 
 
 ## Senior SDE | 2026-04-23 | DONE → devs
