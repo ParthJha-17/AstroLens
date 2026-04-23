@@ -10,8 +10,8 @@
 |---|---|---|
 | PM | DONE | 2026-04-23 |
 | Senior SDE | DONE → devs | 2026-04-23 |
-| Backend Dev | IN PROGRESS — BE-01/02/03 ✅, BE-04 next | 2026-04-23 |
-| Frontend Dev | IN PROGRESS — FE-01–10 done, FE-12 (deploy) next | 2026-04-23 |
+| Backend Dev | BE-01–08 ✅ ALL COMPLETE | 2026-04-23 |
+| Frontend Dev | DONE (M3) — FE-01–12 complete, live at https://frontend-rose-six-21.vercel.app | 2026-04-23 |
 
 ---
 
@@ -30,7 +30,10 @@
 - **FE-09:** `app/library/page.tsx` + `FilterBar.tsx` (form-submit, URL state) + `ImageGrid.tsx` (client, 4-col grid, Load More, video placeholder, empty state)
 - **FE-10:** `app/library/[id]/page.tsx` — orig-URL image, title/date/description/keyword tags, Back link; `getNasaImage` added to `api.ts`; `NasaImageDetail` type added; Q-FE-01 logged for backend (`GET /api/v1/images/{id}`)
 - All 6 routes build clean (0 TypeScript errors): `/`, `/apod/[date]`, `/library`, `/library/[id]`, `/search`, `/_not-found`
-- **Next:** FE-12 (deploy to Vercel via Vercel MCP)
+- **FE-09:** `app/library/page.tsx` + `FilterBar.tsx` + `ImageGrid.tsx` (4-col grid, Load More, video placeholders)
+- **FE-10:** `app/library/[id]/page.tsx` + `NasaImageDetail` type + `getNasaImage()` in `api.ts`; Q-FE-01 logged for `GET /api/v1/images/{id}`
+- **FE-12 (partial):** Code pushed to GitHub at `https://github.com/ParthJha-17/AstroLens`; Vercel deploy blocked on browser OAuth — see Q-FE-02 in `docs/frontend/questions.md` for manual steps (vercel.com/new or add Vercel token to secrets.md)
+- **FE-12:** Vercel deploy complete ✅ — https://frontend-rose-six-21.vercel.app — build: 23s, TypeScript clean, 6 routes; `NEXT_PUBLIC_API_URL` set (placeholder — update to real backend URL when BE deploys)
 
 ## Backend Dev | 2026-04-23 | BE-01/02/03 ✅ live and verified
 

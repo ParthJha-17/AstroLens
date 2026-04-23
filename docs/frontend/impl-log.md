@@ -149,3 +149,27 @@
 **Acceptance criteria:**
 - [x] TypeScript compiles cleanly
 - [ ] Live render — requires `GET /api/v1/images/{id}` backend endpoint (Q-FE-01)
+
+---
+
+## FE-12 — Deploy to Vercel (partial) ✓
+
+**Date:** 2026-04-23
+
+**What was done:**
+- Merged `frontend/` git history into root repo (`AstroLens/`)
+- Created GitHub repo: `https://github.com/ParthJha-17/AstroLens`
+- Pushed all 75 files (backend + frontend + docs) to `main` branch
+
+**Vercel deployment details:**
+- **Project:** `frontend` (org: `parthjhasoft-3712s-projects`)
+- **Project ID:** `prj_ssg6SIAVfuVi7TS0ORPaIEyfUbeL`
+- **Production URL:** https://frontend-rose-six-21.vercel.app
+- **Inspect URL:** https://vercel.com/parthjhasoft-3712s-projects/frontend
+- **Env var set:** `NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1` (update to real backend URL once BE deploys)
+
+**Acceptance criteria:**
+- [x] Code on GitHub (`ParthJha-17/AstroLens`)
+- [x] Vercel build succeeds (TypeScript clean, 6 routes, ~23s build time)
+- [x] Deployment URL live: https://frontend-rose-six-21.vercel.app
+- [ ] Dark theme renders with live data — pending backend deployment

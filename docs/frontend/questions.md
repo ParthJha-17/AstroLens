@@ -4,6 +4,25 @@
 
 ---
 
+## Q-FE-02 — Vercel token needed to complete FE-12 deployment
+
+**Status:** OPEN — action required by user
+**Blocking:** FE-12 (Vercel deploy)
+
+Code is pushed to GitHub at `https://github.com/ParthJha-17/AstroLens`. To deploy:
+
+**Option A (easiest):** Import directly on Vercel  
+1. Go to `vercel.com/new` → "Import Git Repository" → select `ParthJha-17/AstroLens`
+2. Set root directory to `frontend`
+3. Add env var: `NEXT_PUBLIC_API_URL` = `https://<backend-url>/api/v1` (placeholder ok for now)
+4. Deploy — Vercel auto-detects Next.js
+
+**Option B:** Get a Vercel token and add to `secrets.md` as `## Vercel → API Token: <token>`, then run `npx vercel deploy --token <token>` from `frontend/`
+
+Once deployed, record the Vercel URL in `docs/frontend/impl-log.md`.
+
+---
+
 ## Q-FE-01 — Library detail needs `GET /api/v1/images/{id}` backend endpoint
 
 **Status:** OPEN
