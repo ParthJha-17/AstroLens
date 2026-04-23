@@ -8,24 +8,7 @@ from config import settings
 logger = logging.getLogger(__name__)
 client = AsyncOpenAI(api_key=settings.openai_api_key)
 
-TOOLS = [
-    {
-        "type": "function",
-        "function": {
-            "name": "web_search",
-            "description": "Search the web for NASA mission context, scientific background, and discovery history",
-            "parameters": {
-                "type": "object",
-                "properties": {"query": {"type": "string"}},
-                "required": ["query"],
-            },
-        },
-    }
-]
-
-SYSTEM_PROMPT = """You are an astronomy briefing agent for AstroLens. You will receive a NASA image title, date, and NASA's own caption.
-
-Use the web_search tool to find mission context, scientific background, and discovery history before writing your response.
+SYSTEM_PROMPT = """You are an astronomy briefing agent for AstroLens. Based on the NASA image information and web search results provided, synthesize a structured briefing.
 
 Respond ONLY with valid JSON matching this exact schema — no markdown, no explanation:
 {
@@ -37,13 +20,14 @@ Respond ONLY with valid JSON matching this exact schema — no markdown, no expl
   ]
 }
 
-Include all sources that were useful. Minimum 3 sources total."""
+Populate sources from the search results. If search results are empty, reference well-known authoritative sources (nasa.gov, etc.) by URL."""
 
 
 async def _web_search(query: str) -> list[dict]:
     try:
-        results = await asyncio.to_thread(
-            lambda: list(DDGS().text(query, max_results=5))
+        results = await asyncio.wait_for(
+            asyncio.to_thread(lambda: list(DDGS().text(query, max_results=5))),
+            timeout=5.0,
         )
         return [{"title": r["title"], "url": r["href"], "snippet": r["body"]} for r in results]
     except Exception as exc:
@@ -51,43 +35,37 @@ async def _web_search(query: str) -> list[dict]:
         return []
 
 
-async def _dispatch_tool(tool_call) -> list[dict]:
-    args = json.loads(tool_call.function.arguments)
-    return await _web_search(args["query"])
-
-
 async def generate_briefing(title: str, date: str, explanation: str) -> dict:
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": f"Title: {title}\nDate: {date}\nNASA Caption: {explanation}"},
-    ]
+    # Run web search while building the prompt (single query, we decide it)
+    query = f"{title} NASA astronomy"
+    search_results = await _web_search(query)
 
-    # Pass 1: GPT-4o decides tool calls
-    r1 = await client.chat.completions.create(
-        model="gpt-4o",
-        messages=messages,
-        tools=TOOLS,
-        tool_choice="required",
+    if search_results:
+        search_context = "\n".join(
+            f"- [{r['title']}]({r['url']}): {r['snippet'][:250]}"
+            for r in search_results[:4]
+        )
+    else:
+        search_context = "No web search results available."
+
+    user_message = (
+        f"Image: {title}\n"
+        f"Date: {date}\n"
+        f"NASA Caption: {explanation[:1200]}\n\n"
+        f"Web Search Results:\n{search_context}"
     )
 
-    tool_calls = r1.choices[0].message.tool_calls
-    messages.append(r1.choices[0].message)
-
-    # Execute all tool calls concurrently
-    results = await asyncio.gather(
-        *[_dispatch_tool(tc) for tc in tool_calls],
-        return_exceptions=True,
+    response = await asyncio.wait_for(
+        client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_message},
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.3,
+        ),
+        timeout=8.0,
     )
 
-    for tc, result in zip(tool_calls, results):
-        content = json.dumps(result) if not isinstance(result, Exception) else "[]"
-        messages.append({"role": "tool", "tool_call_id": tc.id, "content": content})
-
-    # Pass 2: synthesize into Briefing JSON
-    r2 = await client.chat.completions.create(
-        model="gpt-4o",
-        messages=messages,
-        response_format={"type": "json_object"},
-    )
-
-    return json.loads(r2.choices[0].message.content)
+    return json.loads(response.choices[0].message.content)
