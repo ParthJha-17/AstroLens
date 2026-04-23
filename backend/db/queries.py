@@ -9,6 +9,13 @@ def _d(s: str) -> date_type:
     return date_type.fromisoformat(s)
 
 
+def _j(v):
+    """Parse JSONB field — asyncpg may return string or native Python object."""
+    if isinstance(v, str):
+        return json.loads(v)
+    return v
+
+
 async def get_apod_by_date(pool, date: str) -> dict | None:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
@@ -110,8 +117,8 @@ async def get_briefing(pool, date: str) -> dict | None:
         if row is None:
             return None
         r = dict(row)
-        r["key_facts"] = list(r["key_facts"])
-        r["sources"] = list(r["sources"])
+        r["key_facts"] = _j(r["key_facts"])
+        r["sources"] = _j(r["sources"])
         return r
 
 
@@ -136,6 +143,6 @@ async def insert_briefing(pool, briefing: dict) -> dict:
                 _d(briefing["apod_date"]),
             )
         r = dict(row)
-        r["key_facts"] = list(r["key_facts"])
-        r["sources"] = list(r["sources"])
+        r["key_facts"] = _j(r["key_facts"])
+        r["sources"] = _j(r["sources"])
         return r
