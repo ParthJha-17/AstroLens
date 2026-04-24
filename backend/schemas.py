@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import BaseModel
 
 
@@ -24,10 +25,12 @@ class NasaImage(BaseModel):
     thumb_url: str | None = None
     date_created: str | None = None
     media_type: str = "image"
+    description: str | None = None
+    keywords: list[str] = []
 
 
 class Source(BaseModel):
-    type: str
+    type: Literal["web", "reddit", "youtube"]
     title: str
     url: str
 

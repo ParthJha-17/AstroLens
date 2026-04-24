@@ -55,7 +55,7 @@ async def get_apod_feed(start: str, end: str, request: Request):
 
 @router.get("/apod/search", response_model=list[SearchResult])
 @limiter.limit("60/minute")
-async def search_apod_route(q: str, limit: int = 20, request: Request = None):
+async def search_apod_route(q: str, request: Request, limit: int = 20):
     if not q or not q.strip():
         raise HTTPException(status_code=422, detail="Query parameter 'q' must not be empty")
     if not (1 <= limit <= 100):

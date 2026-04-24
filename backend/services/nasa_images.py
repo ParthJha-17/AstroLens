@@ -43,6 +43,8 @@ async def get_nasa_image(nasa_id: str) -> dict | None:
     return {
         "nasa_id": meta.get("nasa_id", ""),
         "title": meta.get("title", ""),
+        "description": meta.get("description"),
+        "keywords": meta.get("keywords", []),
         "thumb_url": thumb,
         "date_created": meta.get("date_created", "")[:10] if meta.get("date_created") else None,
         "media_type": meta.get("media_type", "image"),

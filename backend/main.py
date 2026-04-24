@@ -1,4 +1,5 @@
 import httpx
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -8,7 +9,15 @@ from limiter import limiter
 from db.connection import create_pool, close_pool
 from routers import apod, images, briefings
 
-app = FastAPI(title="AstroLens API", version="1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.pool = await create_pool()
+    yield
+    await close_pool(app.state.pool)
+
+
+app = FastAPI(title="AstroLens API", version="1.0", lifespan=lifespan)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -26,16 +35,6 @@ app.add_middleware(
 app.include_router(apod.router, prefix="/api/v1")
 app.include_router(images.router, prefix="/api/v1")
 app.include_router(briefings.router, prefix="/api/v1")
-
-
-@app.on_event("startup")
-async def startup():
-    app.state.pool = await create_pool()
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await close_pool(app.state.pool)
 
 
 @app.exception_handler(httpx.HTTPError)

@@ -8,7 +8,7 @@ router = APIRouter()
 
 @router.get("/images/search", response_model=list[NasaImage])
 @limiter.limit("60/minute")
-async def search_images(q: str, page: int = 1, limit: int = 20, request: Request = None):
+async def search_images(request: Request, q: str, page: int = 1, limit: int = 20):
     if not q or not q.strip():
         raise HTTPException(status_code=422, detail="Query parameter 'q' must not be empty")
     if page < 1:
@@ -20,7 +20,7 @@ async def search_images(q: str, page: int = 1, limit: int = 20, request: Request
 
 @router.get("/images/{nasa_id}", response_model=NasaImage)
 @limiter.limit("60/minute")
-async def get_image(nasa_id: str, request: Request = None):
+async def get_image(nasa_id: str, request: Request):
     image = await get_nasa_image(nasa_id)
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")

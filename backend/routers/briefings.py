@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from fastapi import APIRouter, HTTPException, Request
 from schemas import Briefing, GenerateBriefingRequest
@@ -25,9 +26,15 @@ async def generate_briefing_route(body: GenerateBriefingRequest, request: Reques
         apod_data = await fetch_apod(body.apod_date)
         apod = await upsert_apod(pool, apod_data)
 
-    briefing_dict = await run_agent(apod["title"], apod["date"], apod["explanation"])
-    briefing_dict["apod_date"] = body.apod_date
+    try:
+        briefing_dict = await run_agent(apod["title"], apod["date"], apod["explanation"])
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=503, detail="Briefing generation timed out. Please try again.")
+    except Exception as exc:
+        logger.error("Agent error for %s: %s", body.apod_date, exc)
+        raise HTTPException(status_code=503, detail="Briefing generation failed. Please try again.")
 
+    briefing_dict["apod_date"] = body.apod_date
     return await insert_briefing(pool, briefing_dict)
 
 
