@@ -71,7 +71,7 @@ export default function BriefingPanel({ date, initialBriefing }: BriefingPanelPr
     return (
       <div className="mt-8 bg-space-800 border border-slate-700 rounded-lg p-6 flex items-center gap-4">
         <div className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
-        <p className="text-slate-400">Searching the web, Reddit, and YouTube...</p>
+        <p className="text-slate-400">Searching the web for context...</p>
       </div>
     );
   }

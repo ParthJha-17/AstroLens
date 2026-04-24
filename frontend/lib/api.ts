@@ -23,12 +23,9 @@ export type SearchResult = Pick<ApodItem, 'date' | 'title' | 'url' | 'media_type
 export type NasaImage = {
   nasa_id: string
   title: string
-  thumb_url: string
-  date_created: string
+  thumb_url: string | null
+  date_created: string | null
   media_type: string
-}
-
-export type NasaImageDetail = NasaImage & {
   description?: string
   keywords?: string[]
 }
@@ -66,8 +63,8 @@ export async function searchImages(q: string, page = 1, limit = 20): Promise<Nas
   )
 }
 
-export async function getNasaImage(id: string): Promise<NasaImageDetail> {
-  return apiFetch<NasaImageDetail>(`/images/${encodeURIComponent(id)}`)
+export async function getNasaImage(id: string): Promise<NasaImage> {
+  return apiFetch<NasaImage>(`/images/${encodeURIComponent(id)}`)
 }
 
 export async function getBriefing(date: string): Promise<Briefing | null> {
@@ -81,6 +78,6 @@ export async function generateBriefing(date: string): Promise<Briefing> {
   return apiFetch<Briefing>('/briefings/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ date }),
+    body: JSON.stringify({ apod_date: date }),
   })
 }

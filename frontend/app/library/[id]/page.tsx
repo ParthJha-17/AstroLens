@@ -50,7 +50,6 @@ export default async function LibraryDetailPage({ params }: Props) {
           width={1200}
           height={800}
           className="w-full object-contain max-h-[70vh]"
-          onError={undefined}
           unoptimized
         />
       </div>
