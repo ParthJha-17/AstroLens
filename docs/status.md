@@ -9,13 +9,49 @@
 | Agent | Status | Last Updated |
 |---|---|---|
 | PM | DONE | 2026-04-23 |
-| Senior SDE | DONE → devs | 2026-04-23 |
-| Backend Dev | BE-01–08 ✅ ALL COMPLETE | 2026-04-23 |
-| Frontend Dev | DONE (M3/M4/M5) — all FE tasks complete, live at https://frontend-rose-six-21.vercel.app | 2026-04-23 |
+| Senior SDE | REVIEW COMPLETE — fixes required | 2026-04-24 |
+| Backend Dev | FIXES NEEDED: HIGH-01, MED-01, MED-02, LOW-01, LOW-02 | — |
+| Frontend Dev | NEEDS REVIEW → senior-sde | 2026-04-24 |
 
 ---
 
 ## Status Log
+
+## Frontend Dev | 2026-04-24 | Review fixes applied — NEEDS REVIEW
+
+- **CRIT-01 ✅** `lib/api.ts:81` — `JSON.stringify({ date })` → `JSON.stringify({ apod_date: date })`; fixes 422 on every `POST /briefings/generate`
+- **HIGH-02 ✅** `BriefingPanel.tsx:74` — spinner text changed to `"Searching the web for context..."` (removed Reddit/YouTube refs)
+- **MED-03 ✅** `lib/api.ts` — `NasaImage.thumb_url`/`date_created` typed as `string | null`; `description?`/`keywords?` merged in; `NasaImageDetail` type removed; `getNasaImage` return type updated to `NasaImage`
+- **LOW-03 ✅** `app/library/[id]/page.tsx` — removed no-op `onError={undefined}` prop
+- **LOW-04 ✅** Verified — `generateMetadata` and page component call same URL; Next.js native `fetch` deduplication handles it; no code change needed
+- `npm run build` clean (0 TypeScript errors) after all changes
+- Commit: `3138373` — pushed to `main`
+
+## Senior SDE | 2026-04-24 | Code review complete — fixes required
+
+**Files reviewed:** All 12 backend files (main.py, config.py, limiter.py, schemas.py, db/connection.py, db/queries.py, services/nasa_apod.py, services/nasa_images.py, routers/apod.py, routers/briefings.py, routers/images.py, agents/briefing_agent.py) + all 14 frontend files (lib/api.ts, layout.tsx, page.tsx, TodayHero.tsx, RecentFeed.tsx, ImageViewer.tsx, BriefingPanel.tsx, SourceList.tsx, SearchBar.tsx, SearchResults.tsx, FilterBar.tsx, ImageGrid.tsx, apod/[date]/page.tsx, library/[id]/page.tsx)
+
+**Findings written to:** `docs/senior-sde/review-feedback.md`
+
+**Critical (1):**
+- CRIT-01 — `frontend/lib/api.ts:83`: `generateBriefing` sends `{ date }` but backend expects `{ apod_date }` → 422 on every POST /briefings/generate. Core feature broken. **Frontend Dev must fix first.**
+
+**High (2):**
+- HIGH-01 — `services/nasa_images.py`: `get_nasa_image` discards `description`/`keywords` from NASA response → library detail page always blank
+- HIGH-02 — `BriefingPanel.tsx:73`: spinner text says "Reddit, and YouTube" — those sources are unavailable (Q-02)
+
+**Medium (3):**
+- MED-01 — `routers/briefings.py`: `asyncio.TimeoutError` from 8s GPT-4o timeout unhandled → HTTP 500; should be 503
+- MED-02 — `schemas.py`: `Source.type` is unvalidated `str`; should be `Literal["web","reddit","youtube"]`
+- MED-03 — `lib/api.ts`: `NasaImage.thumb_url` and `date_created` typed non-nullable but backend returns `null`
+
+**Low (4):** LOW-01 (`@app.on_event` deprecated), LOW-02 (`request: Request = None`), LOW-03 (`onError={undefined}` no-op), LOW-04 (double APOD fetch in detail page)
+
+**Positive:** Cache-first pattern, `_j()` JSONB fix, `statement_cache_size=0`, full-text search SQL, BriefingPanel state machine, asyncio timeouts, `response_format=json_object`, async params pattern all solid.
+
+**Also completed this session:** Deployed backend to Vercel, agent rewritten single-pass (~4s vs ~25s), `NEXT_PUBLIC_API_URL` updated, frontend redeployed. Both services live.
+
+**Next:** Backend Dev addresses HIGH-01, MED-01, MED-02. Frontend Dev addresses CRIT-01 (blocking), HIGH-02, MED-03.
 
 ## Frontend Dev | 2026-04-23 | FE-01–08 complete
 
